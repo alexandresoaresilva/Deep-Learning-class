@@ -95,8 +95,9 @@ for i=3:4
         ' vs ',num2str(i)])
 end
 
-idx = kmeans(X,4);
-GMModel = fitgmdist(X,4)
+k = 3;
+idx = kmeans(X,k);
+GMModel = fitgmdist(X,k)
 GMModel = cluster(GMModel,X);
 
 figure
@@ -156,6 +157,7 @@ plot(strongest);
 
 all_images = load('all_images.mat');
 all_images = all_images.all_images; %remove struct
+<<<<<<< HEAD
 N_train = 5:5:20;
 N_feats = {16, 8, 4, 2};
 % feature vectors
@@ -193,5 +195,30 @@ function feat_M = add_rows_to_feat_M(feat_M, n_of_rows)
         for i=1:num_of_rows_to_be_added
             feat_M(i+m,:) = zeros(1,n);
         end
+=======
+
+M_feats = [16, 8, 4, 2];
+N_train = [5 10 15 20];
+% feature vectors
+f1 = all_images{1,1,2};
+f2 = all_images{1,2,2};
+f3 = all_images{2,1,2};
+% valid points obj
+vpts1 = all_images{1,1,3};
+vpts2 = all_images{1,2,3};
+
+% indexPairs = matchFeatures(f1, f2);
+% indexPairs2 = matchFeatures(f1, f3);
+% indexPairs = matchFeatures(f1,f2) ;
+% matchedPoints1 = vpts1(indexPairs(:,1));
+% matchedPoints2 = vpts2(indexPairs2(:,2));
+
+function M = create_feat_matrix(all_images,obj,n)
+    dummy = cell(n,1)
+    
+    for i=1:n
+        dummy{i} = all_images{obj,i,2};
+        
+>>>>>>> 5841aeb9b740fa17b258fdcf7c8533e0bb430766
     end
 end
