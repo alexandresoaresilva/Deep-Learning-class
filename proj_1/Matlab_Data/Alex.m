@@ -156,19 +156,42 @@ plot(strongest);
 
 all_images = load('all_images.mat');
 all_images = all_images.all_images; %remove struct
-
-N = {16, 8, 4, 2};
+N_train = 5:5:20;
+N_feats = {16, 8, 4, 2};
 % feature vectors
-f1 = all_images{1,1,2};
-f2 = all_images{1,2,2};
-f3 = all_images{2,1,2};
-% valid points obj
-vpts1 = all_images{1,1,3};
-vpts2 = all_images{1,2,3};
 
-indexPairs = matchFeatures(f1, f2);
-indexPairs2 = matchFeatures(f1, f3);
+feats = cell.empty();
+feats_num= 0;
 
-% indexPairs = matchFeatures(f1,f2) ;
-matchedPoints1 = vpts1(indexPairs(:,1));
-matchedPoints2 = vpts2(indexPairs2(:,2));
+for i=1:5
+   a = size(all_images{1,i,2});
+   feats_num(i) = a(1);
+end
+
+max_num_of_feats = max(feats_num);
+idx_max_feats = find(feats_num == max_num_of_feats);
+idx_max_feats = idx_max_feats(1);
+
+new_M = add_rows_to_feat_M( all_images{1,1,2}, max_num_of_feats);
+
+%     feats{i} = all_images{1,1:5,2};
+
+% feats_num(i) = max(e
+% 
+% indexPairs = matchFeatures(feats, f2);
+% indexPairs2 = matchFeatures(feats, f3);
+
+% % indexPairs = matchFeatures(f1,f2) ;
+% matchedPoints1 = vpts1(indexPairs(:,1)); 
+% matchedPoints2 = vpts2(indexPairs2(:,2));
+function feat_M = add_rows_to_feat_M(feat_M, n_of_rows)
+    [m,n] = size(feat_M);
+    
+    if n_of_rows ~= n
+        num_of_rows_to_be_added = n_of_rows - m;
+
+        for i=1:num_of_rows_to_be_added
+            feat_M(i+m,:) = zeros(1,n);
+        end
+    end
+end
