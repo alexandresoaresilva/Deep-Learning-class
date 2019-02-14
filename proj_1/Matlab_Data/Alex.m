@@ -157,68 +157,83 @@ plot(strongest);
 
 all_images = load('all_images.mat');
 all_images = all_images.all_images; %remove struct
-<<<<<<< HEAD
+
 N_train = 5:5:20;
 N_feats = {16, 8, 4, 2};
 % feature vectors
 
-feats = cell.empty();
-feats_num= 0;
 
-for i=1:5
-   a = size(all_images{1,i,2});
-   feats_num(i) = a(1);
-end
+[all_images, feat_M] = add_z_rows_to_ALL_feat_Ms(all_images, N_train(1));
 
-max_num_of_feats = max(feats_num);
-idx_max_feats = find(feats_num == max_num_of_feats);
-idx_max_feats = idx_max_feats(1);
+indexPairs = matchFeatures(feat_M, all_images{1,6,2});
 
-new_M = add_rows_to_feat_M( all_images{1,1,2}, max_num_of_feats);
+%valid points from ref pose
+% matchedPoints1 = all_images{1,2}(indexPairs(:,1));
 
-%     feats{i} = all_images{1,1:5,2};
+%equivalend to valid points for 1-5 poses
+SURF_M_concat = concat_SURF_feats(all_images, 1, N_train(1));
 
-% feats_num(i) = max(e
-% 
-% indexPairs = matchFeatures(feats, f2);
-% indexPairs2 = matchFeatures(feats, f3);
-
-% % indexPairs = matchFeatures(f1,f2) ;
-% matchedPoints1 = vpts1(indexPairs(:,1)); 
-% matchedPoints2 = vpts2(indexPairs2(:,2));
-function feat_M = add_rows_to_feat_M(feat_M, n_of_rows)
-    [m,n] = size(feat_M);
-    
-    if n_of_rows ~= n
-        num_of_rows_to_be_added = n_of_rows - m;
-
-        for i=1:num_of_rows_to_be_added
-            feat_M(i+m,:) = zeros(1,n);
-        end
-=======
-
-M_feats = [16, 8, 4, 2];
-N_train = [5 10 15 20];
-% feature vectors
-f1 = all_images{1,1,2};
-f2 = all_images{1,2,2};
-f3 = all_images{2,1,2};
-% valid points obj
-vpts1 = all_images{1,1,3};
-vpts2 = all_images{1,2,3};
-
-% indexPairs = matchFeatures(f1, f2);
-% indexPairs2 = matchFeatures(f1, f3);
+% I1 = imread('cameraman.tif');
+% I2 = imresize(imrotate(I1,-20),1.2);
+% points1 = detectSURFFeatures(I1);
+% points2 = detectSURFFeatures(I2);
+% [f1,vpts1] = extractFeatures(I1,points1);
+% [f2,vpts2] = extractFeatures(I2,points2);
 % indexPairs = matchFeatures(f1,f2) ;
 % matchedPoints1 = vpts1(indexPairs(:,1));
-% matchedPoints2 = vpts2(indexPairs2(:,2));
+% matchedPoints2 = vpts2(indexPairs(:,2));
 
-function M = create_feat_matrix(all_images,obj,n)
-    dummy = cell(n,1)
+% max_num_of_feats = max(feats_num);
+% idx_max_feats = find(feats_num == max_num_of_feats);
+% idx_max_feats = idx_max_feats(1);
+
+function [all_images, feat_M] = add_z_rows_to_ALL_feat_Ms(all_images, no_of_poses)
+    feats = cell.empty();
+    feats_num = 0;
+
+    for i=1:no_of_poses
+       a = size(all_images{1,i,2});
+       feats_num(i) = a(1);
+    end
+
+    max_num_of_feats = max(feats_num);
+%     idx_max_feats = find(feats_num == max_num_of_feats);
+%     idx_max_feats = idx_max_feats(1);
     
-    for i=1:n
-        dummy{i} = all_images{obj,i,2};
+%     features = add_z_rows_to_feat_M( all_images{1,i,2}, max_num_of_feats);
+    
+    features = all_images{1,1,2};
+    
+    feat_M = features;
+%     all_images{1,1,2} = features;
+    
+    for i=2:no_of_poses
+%         features = add_z_rows_to_feat_M( all_images{1,i,2}, max_num_of_feats);
+%         all_images{1,i,2} = features;
+        features = all_images{1,i,2};
+        feat_M = [feat_M; features];
+    end
+    
+    
+    
+end
+
+function feat_M = add_z_rows_to_feat_M(feat_M, n_of_rows)
+    [m,n] = size(feat_M);
+
+    if n_of_rows ~= n
+        num_of_rows_to_be_added = n_of_rows - m;
+        last_row = m + num_of_rows_to_be_added;
+        %adds ows of zero to M to reach n_of_rows 
+        feat_M(m + 1:last_row,:) = zeros(num_of_rows_to_be_added, n)
+    end
+end
+
+function SURF_M_concat = concat_SURF_feats(all_images, obj, no_M_to_concat)
+    
+    SURF_M_concat = all_images{obj,1,3};
+    for i=1:no_M_to_concat
         
->>>>>>> 5841aeb9b740fa17b258fdcf7c8533e0bb430766
+       SURF_M_concat = vertcat(SURF_M_concat, all_images{obj,i,3});
     end
 end
