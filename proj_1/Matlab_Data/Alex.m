@@ -165,7 +165,7 @@ N_feats = {16, 8, 4, 2};
 
 [all_images, feat_M] = add_z_rows_to_ALL_feat_Ms(all_images, N_train(1));
 
-indexPairs = matchFeatures(feat_M, all_images{1,6,2});
+indexPairs = matchFeatures(feat_M, all_images{1,6,2},'Unique',1);
 
 %valid points from ref pose
 % matchedPoints1 = all_images{1,2}(indexPairs(:,1));
@@ -233,7 +233,6 @@ function SURF_M_concat = concat_SURF_feats(all_images, obj, no_M_to_concat)
     
     SURF_M_concat = all_images{obj,1,3};
     for i=1:no_M_to_concat
-        
        SURF_M_concat = vertcat(SURF_M_concat, all_images{obj,i,3});
     end
 end
