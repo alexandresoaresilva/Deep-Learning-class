@@ -164,14 +164,22 @@ N_feats = {16, 8, 4, 2};
 
 
 [all_images, feat_M] = add_z_rows_to_ALL_feat_Ms(all_images, N_train(1));
+SURF_M_concat = concat_SURF_feats(all_images, 1, N_train(1));
 
-indexPairs = matchFeatures(feat_M, all_images{1,6,2},'Unique',1);
+indexPairs = matchFeatures(feat_M, all_images{2,6,2},'Unique',1);
 
 %valid points from ref pose
 % matchedPoints1 = all_images{1,2}(indexPairs(:,1));
 
 %equivalend to valid points for 1-5 poses
-SURF_M_concat = concat_SURF_feats(all_images, 1, N_train(1));
+
+matchedPoints1 = SURF_M_concat(indexPairs(:,1));
+matchedPoints2 = all_images{2,6,3}(indexPairs(:,2));
+
+% 
+% figure; showMatchedFeatures(all_images{1,3,1},all_images{1,6,1},...
+%     matchedPoints1,matchedPoints2);
+% legend('matched points 1','matched points 2');
 
 % I1 = imread('cameraman.tif');
 % I2 = imresize(imrotate(I1,-20),1.2);
