@@ -162,7 +162,16 @@ N_feats = [16, 8, 4, 2];
 
 [no_matched_points, accuracy] = get_matches(all_images, N_poses(1), N_feats(1));
 
+calc_accuracy = length(find(accuracy == 1))/length(accuracy)
+
+%worse case, 2 features, 5 poses
 [no_matched_points1, accuracy1] = get_matches(all_images, N_poses(1), N_feats(4));
+
+calc_accuracy2 = length(find(accuracy1 == 1))/length(accuracy1)
+
+
+
+% (accuracy1 )
     
 %     train_accuracies{1,1} = no_matched_points;
 %     train_accuracies{1,2} = accuracy;
