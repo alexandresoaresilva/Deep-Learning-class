@@ -1,3 +1,4 @@
+clc, clear, close all
 %% after extracting images from Columbia U's dataset:
 % it's not possible to collect 167 features for a lot of the pictures
 % all_images(:,:,1): cell matrix, rows: each i_th is an obj
@@ -43,10 +44,11 @@ train_accuracies = cell.empty();
  yticks(0:10:110);
  xticks(0:2:20);
  ylim([0 105]);
- xlim([5 20]);
+ xlim([0 20]);
  xlabel('Number of Training Images');
  ylabel('Accuracy(%%)');
- legend({'2 features';'4 features';'8 features';'16 features'});
+ legend({'2 features';'4 features';'8 features';'16 features'},...
+     'Location','southeast');
 % (accuracy1 )
     
 %     train_accuracies{1,1} = no_matched_points;
@@ -87,8 +89,8 @@ function [no_matched_points, accuracy] =...
         end
         % after all matches have been made
         % if train object has more features matched with the right test
-        [~, index_max] = max(no_matched_points(i,:));
-%         index_max = find(max_j == no_matched_points(i,:));
+        max_j = max(no_matched_points(i,:));
+        index_max = find(max_j == no_matched_points(i,:));
 
         if index_max == i
             accuracy(i) = 1;
@@ -97,7 +99,7 @@ function [no_matched_points, accuracy] =...
         end
     end
     
-%     train_accuracies{1,1} = no_matched_points;
+    train_accuracies{1,1} = no_matched_points;
     accuracy = length(find(accuracy == 1))/length(accuracy);
 end
 
@@ -127,35 +129,74 @@ end
 function feat_M =...
     get_feat_M(all_images, obj, startPose, N_poses, N_feats)
     %gets no of features available
-    [m,~] = size(all_images{obj,startPose,2});
-    features  = 0;
     
-    if m < N_feats %if fewer feats than the required are available
-        N_feat_to_be_added = N_feats -m;
-%         all_images{obj,startPose,2};
-         features = all_images{obj,startPose,2};
-%          features(m+1:m+N_feat_to_be_added,:) = 0;
+    
+    if ~N_poses
+        feat_M = single(zeros(N_feats,64));
     else
-        features = all_images{obj,startPose,2}(1:N_feats,:);
-    end
-    
-    feat_M = features;
-    
-    for i= (startPose+1):N_poses %concatenate all poses required
-        
-        [m,~] = size(all_images{obj,i,2});
+        [m,~] = size(all_images{obj,startPose,2});
+        features  = 0;
+
         if m < N_feats %if fewer feats than the required are available
             N_feat_to_be_added = N_feats -m;
-            features = all_images{obj,i,2};
-%             features(m+1:m+N_feat_to_be_added,:) = 0;
+    %         all_images{obj,startPose,2};
+             features = all_images{obj,startPose,2};
+    %          features(m+1:m+N_feat_to_be_added,:) = 0;
         else
-            features = all_images{obj,i,2}(1:N_feats,:);
+            features = all_images{obj,startPose,2}(1:N_feats,:);
         end
-        %concatenate them vertically
-        feat_M = [feat_M; features];
+
+        feat_M = features;
+
+        for i= (startPose+1):N_poses %concatenate all poses required
+
+            [m,~] = size(all_images{obj,i,2});
+            if m < N_feats %if fewer feats than the required are available
+                N_feat_to_be_added = N_feats -m;
+                features = all_images{obj,i,2};
+    %             features(m+1:m+N_feat_to_be_added,:) = 0;
+            else
+                features = all_images{obj,i,2}(1:N_feats,:);
+            end
+            %concatenate them vertically
+            feat_M = [feat_M; features];
+        end
     end
 end
-
+% 
+% 
+% % this takes care of smaller
+% function feat_M =...
+%     get_feat_M(all_images, obj, startPose, N_poses, N_feats)
+%     %gets no of features available
+%     [m,~] = size(all_images{obj,startPose,2});
+%     features  = 0;
+%     
+%     if m < N_feats %if fewer feats than the required are available
+%         N_feat_to_be_added = N_feats -m;
+% %         all_images{obj,startPose,2};
+%          features = all_images{obj,startPose,2};
+% %          features(m+1:m+N_feat_to_be_added,:) = 0;
+%     else
+%         features = all_images{obj,startPose,2}(1:N_feats,:);
+%     end
+%     
+%     feat_M = features;
+%     
+%     for i= (startPose+1):N_poses %concatenate all poses required
+%         
+%         [m,~] = size(all_images{obj,i,2});
+%         if m < N_feats %if fewer feats than the required are available
+%             N_feat_to_be_added = N_feats -m;
+%             features = all_images{obj,i,2};
+% %             features(m+1:m+N_feat_to_be_added,:) = 0;
+%         else
+%             features = all_images{obj,i,2}(1:N_feats,:);
+%         end
+%         %concatenate them vertically
+%         feat_M = [feat_M; features];
+%     end
+% end
 
 % 
 % function [no_matched_points, accuracy] =...
