@@ -15,7 +15,7 @@ clc, clear, close all
 all_images = load('all_images.mat');
 all_images = all_images.all_images; %remove struct
 
-N_poses = 0:2:20;
+N_poses = 0:1:20;
 N_feats = [2, 4, 8, 16];
 %% 5 features, 16 features
 no_matched_points = cell.empty();
@@ -131,7 +131,8 @@ function feat_M =...
     %gets no of features available
     
     
-    if ~N_poses
+    if ~N_poses % in the case of 0 features. feat matrix is N_feats x 64 
+        % filled up with zeros
         feat_M = single(zeros(N_feats,64));
     else
         [m,~] = size(all_images{obj,startPose,2});
