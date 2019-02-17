@@ -15,7 +15,8 @@ for i=1:length(imgs)
         imgs{j} = I;
         s_feat = detectSURFFeatures(I);
         [features,validPoints] = extractFeatures(I, s_feat);
-        validPoints_dummy{j} = validPoints.selectStrongest(16);
+%         validPoints_dummy{j} = validPoints.selectStrongest(16);
+        validPoints_dummy{j} = validPoints;
         feats{j} = features;
     end 
     all_images(i,:,1) = imgs;

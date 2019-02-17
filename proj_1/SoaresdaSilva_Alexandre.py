@@ -18,16 +18,17 @@ import cv2 as cv
 from matplotlib import pyplot as plt
 
 
-I = cv.imread('Matlab_Data\cameraman.tif')
+I = cv.imread('Matlab_Data\cameraman.tif', cv.IMREAD_GRAYSCALE)
 
-plt.imshow(I)
+#plt.imshow(I)
 
 
 #If = np.fft.fftshift(np.fft.fft2(I))
 If = np.fft.fftshift(np.fft.fft2(I))
 If_log = np.log(1 + np.abs(If))
 If_disp = If_log/np.max(If_log)
-plt.imshow(If_disp, cmap ='Greys',vmin=0, vmax=1)
+plt.imshow(If_disp,cmap=plt.cm.gray)
+plt.show()
 
 #import matplotlib.pyplot as plt
 #

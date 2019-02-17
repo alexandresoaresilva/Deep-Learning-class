@@ -1,7 +1,6 @@
 clc, clear, close all
 filt =@(n)1/n^2*ones(n);
 %% onion grayscale
-
 I_gray = rgb2gray(imread('onion.png'));
 imwrite(I_gray,'onion_gray.png');
 
@@ -15,6 +14,7 @@ subplot(121)
 imshow(I,[]);
 subplot(122)
 imshow(If_disp,[]);
+
 %% 2D Fourier Space 2 (low pass filter)
 radius = [5 10 25 50];
 [x,y] = meshgrid(-128:127,-128:127);
@@ -109,7 +109,7 @@ color = {'r','b','g','k'};
 for i=1:4
     hold on
     index = find(idx == i);
-    scatter(X(index,3),X(index,4),color{i})
+    scatter(X(index,3),X(index,4),color{i});
 end
 hold off
 
@@ -121,7 +121,7 @@ color = {'r','b','g','k'};
 for i=1:4
     hold on
     index = find(GMModel == i);
-    scatter(X(index,3),X(index,4),color{i})
+    scatter(X(index,3),X(index,4),color{i});
 end
 hold off
 %% SURF features
@@ -147,100 +147,124 @@ plot(strongest);
 %                                 columns: each is a validPoints SURF 
 %                                          obj of the of the i_th obj in
 %                                           channel 1 (:,:,1)
-% example of SURF features vector
-%               Scale: [8×1 single]
-%     SignOfLaplacian: [8×1 int8]
-%         Orientation: [8×1 single]
-%            Location: [8×2 single]
-%              Metric: [8×1 single]
-%               Count: 8
-
 all_images = load('all_images.mat');
 all_images = all_images.all_images; %remove struct
 
-N_train = 5:5:20;
-N_feats = {16, 8, 4, 2};
-% feature vectors
+N_poses = 5:5:20;
+N_feats = [16, 8, 4, 2];
+%% 5 features, 16 features
+no_matched_points = 0;
+accuracy = 0;
+train_accuracies = cell.empty();
+
+N_feats = [16, 8, 4, 2];
+    % for k=N_train
+
+[no_matched_points, accuracy] = get_matches(all_images, N_poses(1), N_feats(1));
+
+[no_matched_points1, accuracy1] = get_matches(all_images, N_poses(1), N_feats(4));
+    
+%     train_accuracies{1,1} = no_matched_points;
+%     train_accuracies{1,2} = accuracy;
 
 
-[all_images, feat_M] = add_z_rows_to_ALL_feat_Ms(all_images, N_train(1));
-SURF_M_concat = concat_SURF_feats(all_images, 1, N_train(1));
-
-indexPairs = matchFeatures(feat_M, all_images{2,6,2},'Unique',1);
-
-%valid points from ref pose
-% matchedPoints1 = all_images{1,2}(indexPairs(:,1));
-
-%equivalend to valid points for 1-5 poses
-
-matchedPoints1 = SURF_M_concat(indexPairs(:,1));
-matchedPoints2 = all_images{2,6,3}(indexPairs(:,2));
-
+% for a=1:length(N_poses)
+%     for k=1:length(N_feats)
+%         for i=1:10 % i is the train object 
+%             for j=1:10 % j is the test object
+%                 [matchedPoints1, matchedPoints2] = ...
+%                     get_match_pts(all_images, i,j, N_poses(a), N_feats(k));
+%                 no_matched_points(i,j,k) = length(matchedPoints1.Scale);
+%             end
+%         end
+%         
+%         max_j = max(no_matched_points(i,:));
+%         index_max = find(max_j == no_matched_points(i,:));
 % 
-% figure; showMatchedFeatures(all_images{1,3,1},all_images{1,6,1},...
-%     matchedPoints1,matchedPoints2);
-% legend('matched points 1','matched points 2');
+%         % if train object has more features matched with the right test
+%         if index_max == i
+%             accuracy(k,i) = 1;
+%         else
+%             accuracy(k,i) = 0;
+%         end
+%     end
+%     train_accuracies{a,1} = no_matched_points;
+%     train_accuracies{a,2} = accuracy;
+% end
 
-% I1 = imread('cameraman.tif');
-% I2 = imresize(imrotate(I1,-20),1.2);
-% points1 = detectSURFFeatures(I1);
-% points2 = detectSURFFeatures(I2);
-% [f1,vpts1] = extractFeatures(I1,points1);
-% [f2,vpts2] = extractFeatures(I2,points2);
-% indexPairs = matchFeatures(f1,f2) ;
-% matchedPoints1 = vpts1(indexPairs(:,1));
-% matchedPoints2 = vpts2(indexPairs(:,2));
+function [no_matched_points, accuracy] =...
+    get_matches(all_images, N_pose, N_feat)
 
-% max_num_of_feats = max(feats_num);
-% idx_max_feats = find(feats_num == max_num_of_feats);
-% idx_max_feats = idx_max_feats(1);
+    for i=1:10 % i is the train object 
+        for j=1:10 % j is the test object
+            [matchedPoints1, ~] = ...
+                get_match_pts(all_images, i,j, N_pose, N_feat);
+            no_matched_points(i,j) = length(matchedPoints1.Scale);
+        end
+        % after all matches have been made
+        % if train object has more features matched with the right test
+        max_j = max(no_matched_points(i,:));
+        index_max = find(max_j == no_matched_points(i,:));
 
-function [all_images, feat_M] = add_z_rows_to_ALL_feat_Ms(all_images, no_of_poses)
-    feats = cell.empty();
-    feats_num = 0;
-
-    for i=1:no_of_poses
-       a = size(all_images{1,i,2});
-       feats_num(i) = a(1);
+        if index_max == i
+            accuracy(i) = 1;
+        else
+            accuracy(i) = 0;
+        end
     end
+    
+    train_accuracies{1,1} = no_matched_points;
+    train_accuracies{1,2} = accuracy;
+end
 
-    max_num_of_feats = max(feats_num);
-%     idx_max_feats = find(feats_num == max_num_of_feats);
-%     idx_max_feats = idx_max_feats(1);
+% feature vectors
+function [matchedPoints1, matchedPoints2] = ...
+    get_match_pts(all_images, obj1,obj2, N_poses, N_feats)
+    [feat_M1, SURF_M_concat1] =...
+        get_feat_M_and_multi_SURF_points(all_images, obj1,...
+                                         1, N_poses, N_feats);
+    [feat_M2, SURF_M_concat2] =...
+        get_feat_M_and_multi_SURF_points(all_images, obj2,...
+                                        (N_poses + 1), 24, N_feats);
+
+    indexPairs = matchFeatures(feat_M1, feat_M2,'Unique',1);
+
+    matchedPoints1 = SURF_M_concat1(indexPairs(:,1));
+    matchedPoints2 = SURF_M_concat2(indexPairs(:,2));
+end
+ 
+% this takes care of smaller
+function [feat_M, SURF_M_concat] =...
+    get_feat_M_and_multi_SURF_points(all_images, obj,...
+                                    startPose, N_poses, N_feats)
+    %gets no of features available
+    [m,~] = size(all_images{obj,startPose,2});
+    features  = 0;
+    SURF_obj = 0;
     
-%     features = add_z_rows_to_feat_M( all_images{1,i,2}, max_num_of_feats);
-    
-    features = all_images{1,1,2};
+    if m < N_feats %if fewer feats than the required are available
+        features = all_images{obj,startPose,2};
+        SURF_obj = all_images{obj,startPose,3};
+    else
+        features = all_images{obj,startPose,2}(1:N_feats,:);
+        SURF_obj = all_images{obj,startPose,3}(1:N_feats);
+    end
     
     feat_M = features;
-%     all_images{1,1,2} = features;
+    SURF_M_concat = SURF_obj;
     
-    for i=2:no_of_poses
-%         features = add_z_rows_to_feat_M( all_images{1,i,2}, max_num_of_feats);
-%         all_images{1,i,2} = features;
-        features = all_images{1,i,2};
+    for i= (startPose+1):N_poses %concatenate all poses required
+        
+        [m,~] = size(all_images{obj,i,2});
+        if m < N_feats %if fewer feats than the required are available
+            features = all_images{obj,i,2};
+            SURF_obj = all_images{obj,i,3};
+        else
+            features = all_images{obj,i,2}(1:N_feats,:);
+            SURF_obj = all_images{obj,i,3}(1:N_feats);
+        end
+        %concatenate them vertically
+        SURF_M_concat = vertcat(SURF_M_concat, SURF_obj);
         feat_M = [feat_M; features];
-    end
-    
-    
-    
-end
-
-function feat_M = add_z_rows_to_feat_M(feat_M, n_of_rows)
-    [m,n] = size(feat_M);
-
-    if n_of_rows ~= n
-        num_of_rows_to_be_added = n_of_rows - m;
-        last_row = m + num_of_rows_to_be_added;
-        %adds ows of zero to M to reach n_of_rows 
-        feat_M(m + 1:last_row,:) = zeros(num_of_rows_to_be_added, n)
-    end
-end
-
-function SURF_M_concat = concat_SURF_feats(all_images, obj, no_M_to_concat)
-    
-    SURF_M_concat = all_images{obj,1,3};
-    for i=1:no_M_to_concat
-       SURF_M_concat = vertcat(SURF_M_concat, all_images{obj,i,3});
     end
 end
