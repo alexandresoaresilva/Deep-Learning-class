@@ -14,7 +14,7 @@
 all_images = load('all_images.mat');
 all_images = all_images.all_images; %remove struct
 
-N_poses = 0:2:20;
+N_poses = 5:5:20;
 N_feats = [2, 4, 8, 16];
 %% 5 features, 16 features
 no_matched_points = cell.empty();
@@ -33,20 +33,9 @@ train_accuracies = cell.empty();
      end
  end
  
- accuracy = accuracy.*100;
+ 
  plot(N_poses, accuracy(:,1))
- hold on
- grid on
- plot(N_poses, accuracy(:,2))
- plot(N_poses, accuracy(:,3))
- plot(N_poses, accuracy(:,4))
- yticks(0:10:110);
- xticks(0:2:20);
- ylim([0 105]);
- xlim([5 20]);
- xlabel('Number of Training Images');
- ylabel('Accuracy(%%)');
- legend({'2 features';'4 features';'8 features';'16 features'});
+ ylim([
 % (accuracy1 )
     
 %     train_accuracies{1,1} = no_matched_points;
@@ -87,8 +76,8 @@ function [no_matched_points, accuracy] =...
         end
         % after all matches have been made
         % if train object has more features matched with the right test
-        [~, index_max] = max(no_matched_points(i,:));
-%         index_max = find(max_j == no_matched_points(i,:));
+        max_j = max(no_matched_points(i,:));
+        index_max = find(max_j == no_matched_points(i,:));
 
         if index_max == i
             accuracy(i) = 1;
@@ -97,7 +86,7 @@ function [no_matched_points, accuracy] =...
         end
     end
     
-%     train_accuracies{1,1} = no_matched_points;
+    train_accuracies{1,1} = no_matched_points;
     accuracy = length(find(accuracy == 1))/length(accuracy);
 end
 
