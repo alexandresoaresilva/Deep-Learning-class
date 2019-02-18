@@ -81,7 +81,7 @@ title('c. filtering and convolution: orig. image');
 
 subplot(132);
 imshow(dI_dx + dI_dy, []);
-title({'c. convolution dI_dx + dI_dy'; 'non-ideal high pass filter'});
+title({'c. convolution dI_dx + dI_dy'; 'Sobel high pass filter'});
 % title('b.3. low pass filter');
 subplot(133);
 imshow(intI, []);
