@@ -1,5 +1,5 @@
 % clear, clc, close all
-imgs = [3,4,5,6, 9,10, 12,13,14, 19];
+imgs = [3,4,5,6,9,10,12,13,14,19];
 pose = [0:11 60:71];
 all_images = cell(length(imgs), length(pose),3);
 
@@ -25,6 +25,5 @@ for i=1:length(imgs)
 end
 
 save('all_images.mat','all_images')
-% indexPairs = matchFeatures(features1,features2);
 
 
