@@ -16,6 +16,8 @@ title('b.1. Intro to the 2D Fourier space');
 subplot(133)
 imshow(If_disp,[]);
 title('b.2. Intro to the 2D Fourier space');
+a = gcf;
+a.WindowState = 'maximized';
 % ====================================
 % >>> b.3. low pass filter
 radius = [5 10 25 50];
@@ -38,7 +40,8 @@ for i=1:length(radius)
     xlabel('low pass mask');
 end
 title('b.3. low pass filter');
-
+a = gcf;
+a.WindowState = 'maximized';
 % ====================================
 % >>> b.4. high pass filter
 figure
@@ -57,6 +60,8 @@ for i=1:length(radius)
     xlabel('high pass mask');
 end
 title('b.4. high pass filter');
+a = gcf;
+a.WindowState = 'maximized';
 %% c. Spacial filtering and convolution
 filt =@(n)1/n^2*ones(n);
 
@@ -76,8 +81,10 @@ title('c. filtering and convolution: orig. image');
 
 subplot(132);
 imshow(dI_dx + dI_dy, []);
-title('c. dI_dx + dI_dy');
-
+title({'c. convolution dI_dx + dI_dy'; 'non-ideal high pass filter'});
+% title('b.3. low pass filter');
 subplot(133);
 imshow(intI, []);
-title('c. integrating filter');
+title({'c. convolution integrating filter'; 'non-ideal low pass filter'});
+a = gcf;
+a.WindowState = 'maximized';

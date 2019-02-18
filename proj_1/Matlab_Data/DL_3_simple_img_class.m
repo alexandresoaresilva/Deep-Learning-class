@@ -6,9 +6,11 @@ I = imread('cameraman.tif');
 s_feat = detectSURFFeatures(I);
 [features,validPoints] = extractFeatures(I,s_feat);
 figure
+subplot(121);
 strongest = validPoints.selectStrongest(10);
 imshow(I); hold on;
 plot(strongest);
+title('cameraman.tif with 10 strongest features');
 %% ================================================
 % >>>>>> b.1. Creating the training feature matrix 
 all_images = load('all_images.mat');
@@ -45,7 +47,8 @@ accuracy = 0;
  
  % plotting the accuracies
  accuracy = accuracy.*100;
- figure
+%  figure
+ subplot(122);
  plot(N_poses, accuracy(:,1));
  hold on
  grid on
@@ -57,9 +60,14 @@ accuracy = 0;
  ylim([0 105]);
  xlim([0 20]);
  xlabel('Number of Training Images');
- ylabel('Accuracy(%%)');
+ ylabel('Accuracy(%)');
  legend({'2 features';'4 features';'8 features';'16 features'},...
      'Location','southeast');
+ title({'Columbia University Image Library dataset: ';...
+     'SURF feature matrices'' classification performance';...
+     '10 different objects in 24 projections'});
+ a = gcf;
+ a.WindowState = 'maximized';
 %% FUNCTIONS ===========================================================
 % >>>> get_matches
 %           inputs: 
